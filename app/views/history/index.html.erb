@@ -1,0 +1,41 @@
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+  google.charts.load("visualization", "1", {packages:["corechart","annotationchart"]});
+  google.charts.setOnLoadCallback(drawCharts);
+
+  function drawCharts() {
+    var data = google.visualization.arrayToDataTable([
+      ['Date', 'Passed', 'Failed', 'Abnormal'],
+      <% @totals.each_with_index do |v, k| %>
+        ['<%= v[0] %>', <%= v[1][:passed] %>, <%= v[1][:failed] %>, <%= v[1][:abnormal] %>],
+      <% end %>
+    ]);
+
+    var options = {
+      hAxis: {title: 'Date/Time'},
+      vAxis: {title: 'Builds'},
+      width: 1200,
+      height: 450,
+      legend: { position: 'top', maxLines: 3, textStyle: {color: 'black', fontSize: 12 } },
+      isStacked: true,
+      trendlines: { 2: {type: 'linear', color: 'green'} }
+    };
+
+    var chart = new google.visualization.ColumnChart(document.getElementById('totals'));
+    chart.draw(data, options);
+
+    var builds = google.visualization.arrayToDataTable([
+      ['Time', 'Duration'],
+      <% @builds.each do |v| %>
+        ['<%= v[0] %>', Math.round(<%= v[1] %>)],
+      <% end %>
+    ]);
+
+    var line_chart = new google.visualization.AreaChart(document.getElementById('builds'));
+    line_chart.draw(builds, options);
+  }
+</script>
+
+<div id="totals"></div>
+<br>
+<div id="builds"></div>
